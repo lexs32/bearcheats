@@ -1,0 +1,24 @@
+{
+  "name": "Bear Cheats",
+  "short_name": "Bear Cheats",
+  "icons": [
+    {
+      "src": "/assets/images/favicon.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/images/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/images/bearcheats_head.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#df923e",
+  "background_color": "#0d0e12",
+  "display": "standalone"
+}
