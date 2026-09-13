@@ -1,10 +1,10 @@
 {
-  "name": "virtualand-clone",
+  "name": "bearcheats",
   "version": "1.0.0",
   "private": true,
-  "description": "High-performance Virtualand storefront clone for Vercel",
+  "description": "Bear Cheats storefront platform",
   "scripts": {
     "start": "npx serve . -p 3000",
-    "build": "echo 'Build complete'"
+    "build": "echo Static build ready"
   }
 }
