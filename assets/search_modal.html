@@ -1,0 +1,540 @@
+<div class="search-modal-overlay">
+<style>
+.search-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10vh;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fadeIn 0.15s ease;
+}
+.search-modal {
+  width: 100%;
+  max-width: 580px;
+  background: #0f0f13;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  max-height: 75vh;
+  margin: 0 1rem;
+}
+.search-modal__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.search-modal__input-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  height: 42px;
+  padding: 0 12px;
+  transition: border-color 0.2s ease;
+}
+.search-modal__input-wrapper:focus-within {
+  border-color: #df923e;
+}
+.search-modal__input-icon {
+  width: 16px;
+  height: 16px;
+  color: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
+.search-modal__input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 14px;
+}
+.search-modal__input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+.search-modal__clear {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.4);
+}
+.search-modal__clear:hover {
+  color: #ffffff;
+}
+.search-modal__close {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.search-modal__close:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+.search-modal__body {
+  overflow-y: auto;
+  flex: 1;
+  padding: 8px 12px 16px;
+}
+.search-modal__group {
+  margin-bottom: 12px;
+}
+.search-modal__group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 8px 6px;
+}
+.search-modal__group-name {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.4);
+}
+.search-modal__group-count {
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
+  border-radius: 9999px;
+  padding: 1px 6px;
+}
+.search-modal__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.search-modal__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  text-decoration: none;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.search-modal__item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.search-modal__item-image {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  max-width: 44px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.search-modal__item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.search-modal__item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.search-modal__item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.search-modal__item-details {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.search-modal__item-price {
+  color: #df923e;
+  font-weight: 600;
+}
+.search-modal__item-stock {
+  color: #10b981;
+  font-size: 11px;
+}
+.search-modal__item-arrow {
+  width: 18px;
+  height: 18px;
+  color: rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.search-modal__item:hover .search-modal__item-arrow {
+  color: #df923e;
+  transform: translateX(2px);
+}
+.search-modal__empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: rgba(255, 255, 255, 0.4);
+  gap: 12px;
+}
+.search-modal__empty i {
+  font-size: 28px;
+  color: rgba(255, 255, 255, 0.2);
+}
+.search-modal__empty p {
+  font-size: 14px;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+</style>
+<div aria-label="Search" aria-modal="true" class="search-modal" role="dialog">
+<div class="search-modal__header">
+<div class="search-modal__input-wrapper">
+<svg class="search-modal__input-icon" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+<input autocomplete="off" class="search-modal__input" id="modalSearchInput" placeholder="Search for products..." type="text" value=""/>
+<button aria-label="Clear search" class="search-modal__clear" type="button">
+<svg class="w-3.5 h-3.5" fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14" xmlns="http://www.w3.org/2000/svg"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+</button>
+</div>
+<button aria-label="Close" class="search-modal__close">
+<svg class="w-4 h-4" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+</button>
+</div>
+<div class="search-modal__body scrollbar-secondary">
+<div class="search-modal__groups">
+<div class="search-modal__group">
+<div class="search-modal__group-header">
+<i class="fa-solid fa-fire text-xs text-accent-500" style="color: #df923e;"></i>
+<span class="search-modal__group-name" style="color: #df923e;">POPULAR</span>
+</div>
+<div class="search-modal__list">
+<a class="search-modal__item" href="/store/arc-raiders/ancient-arc-raiders">
+<div class="search-modal__item-image">
+<img alt="Ancient - ARC Raiders" class="object-cover rounded" src="/assets/images/bearcheats/1103375.webp"/>
+</div>
+<div class="search-modal__item-info">
+<span class="search-modal__item-name">Ancient - ARC Raiders</span>
+<div class="search-modal__item-details">
+<span class="search-modal__item-price">$5.99 - $40.00</span>
+<span class="search-modal__item-stock">In stock</span>
+</div>
+</div>
+<svg class="search-modal__item-arrow" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg>
+</a><a class="search-modal__item" href="/store/raimbow-6/inferno-r6-full">
+<div class="search-modal__item-image">
+<img alt="Inferno - R6 Full" class="object-cover rounded" src="/assets/images/bearcheats/1103360.webp"/>
+</div>
+<div class="search-modal__item-info">
+<span class="search-modal__item-name">Inferno - R6 Full</span>
+<div class="search-modal__item-details">
+<span class="search-modal__item-price">$6.00 - $60.00</span>
+<span class="search-modal__item-stock">In stock</span>
+</div>
+</div>
+<svg class="search-modal__item-arrow" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg>
+</a></div>
+</div>
+<div class="search-modal__group">
+<div class="search-modal__group-header">
+<span class="search-modal__group-name">ARC RAIDERS</span>
+<span class="search-modal__group-count">2</span>
+</div>
+<div class="search-modal__list">
+<a class="search-modal__item" href="/store/arc-raiders/ancient-arc-raiders">
+<div class="search-modal__item-image">
+<img alt="Ancient - ARC Raiders" class="object-cover rounded" src="/assets/images/bearcheats/1103375.webp"/>
+</div>
+<div class="search-modal__item-info">
+<span class="search-modal__item-name">Ancient - ARC Raiders</span>
+<div class="search-modal__item-details">
+<span class="search-modal__item-price">$5.99 - $40.00</span>
+<span class="search-modal__item-stock">In stock</span>
+</div>
+</div>
+<svg class="search-modal__item-arrow" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg>
+</a><a class="search-modal__item" href="/store/arc-raiders/krush-arc-raiders">
+<div class="search-modal__item-image">
+<img alt="Krush - Arc Raiders" class="object-cover rounded" src="/assets/images/bearcheats/1103383.webp"/>
+</div>
+<div class="search-modal__item-info">
+<span class="search-modal__item-name">Krush - Arc Raiders</span>
+<div class="search-modal__item-details">
+<span class="search-modal__item-price">$6.00 - $60.00</span>
+<span class="search-modal__item-stock">In stock</span>
+</div>
+</div>
+<svg class="search-modal__item-arrow" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg>
+</a></div>
+</div>
+<div class="search-modal__group">
+<div class="search-modal__group-header">
+<span class="search-modal__group-name">SIEGE X</span>
+<span class="search-modal__group-count">4</span>
+</div>
+<div class="search-modal__list">
+<a class="search-modal__item" href="/store/raimbow-6/inferno-r6-full">
+<div class="search-modal__item-image">
+<img alt="Inferno - R6 Full" class="object-cover rounded" src="/assets/images/bearcheats/1103360.webp"/>
+</div>
+<div class="search-modal__item-info">
+<span class="search-modal__item-name">Inferno - R6 Full</span>
+<div class="search-modal__item-details">
+<span class="search-modal__item-price">$6.00 - $60.00</span>
+<span class="search-modal__item-stock">In stock</span>
+</div>
+</div>
+<svg class="search-modal__item-arrow" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg>
+</a><a class="search-modal__item" href="/store/raimbow-6/ancient-r6-external">
+<div class="search-modal__item-image">
+<img alt="Ancient - R6 External" class="object-cover rounded" src="/assets/images/bearcheats/1103375.webp"/>
+</div>
+<div class="search-modal__item-info">
+<span class="search-modal__item-name">Ancient - R6 External</span>
+<div class="search-modal__item-details">
+<span class="search-modal__item-price">$6.00 - $30.00</span>
+<span class="search-modal__item-stock">In stock</span>
+</div>
+</div>
+<svg class="search-modal__item-arrow" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg>
+</a><a class="search-modal__item" href="/store/raimbow-6/r6-lite">
+<div class="search-modal__item-image">
+<img alt="R6 Lite" class="object-cover rounded" src="/assets/images/bearcheats/1103430.webp"/>
+</div>
+<div class="search-modal__item-info">
+<span class="search-modal__item-name">R6 Lite</span>
+<div class="search-modal__item-details">
+<span class="search-modal__item-price">$4.99 - $30.00</span>
+<span class="search-modal__item-stock">In stock</span>
+</div>
+</div>
+<svg class="search-modal__item-arrow" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg>
+</a><a class="search-modal__item" href="/store/raimbow-6/sapphire-unlock-all-r6s">
+<div class="search-modal__item-image">
+<img alt="Sapphire Unlock All - R6S" class="object-cover rounded" src="/assets/images/bearcheats/1108022.webp"/>
+</div>
+<div class="search-modal__item-info">
+<span class="search-modal__item-name">Sapphire Unlock All - R6S</span>
+<div class="search-modal__item-details">
+<span class="search-modal__item-price">$10.00 - $40.00</span>
+<span class="search-modal__item-stock">In stock</span>
+</div>
+</div>
+<svg class="search-modal__item-arrow" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg>
+</a></div>
+</div>
+<div class="search-modal__group">
+<div class="search-modal__group-header">
+<span class="search-modal__group-name">APEX LEGENDS</span>
+<span class="search-modal__group-count">1</span>
+</div>
+<div class="search-modal__list">
+<a class="search-modal__item" href="/store/apex-legends/ancient-apex-legends">
+<div class="search-modal__item-image">
+<img alt="Ancient - Apex Legends" class="object-cover rounded" src="/assets/images/bearcheats/3url80.webp"/>
+</div>
+<div class="search-modal__item-info">
+<span class="search-modal__item-name">Ancient - Apex Legends</span>
+<div class="search-modal__item-details">
+<span class="search-modal__item-price">$5.99 - $45.00</span>
+<span class="search-modal__item-stock">In stock</span>
+</div>
+</div>
+<svg class="search-modal__item-arrow" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg>
+</a></div>
+</div>
+<div class="search-modal__group">
+<div class="search-modal__group-header">
+<span class="search-modal__group-name">CALL OF DUTY</span>
+<span class="search-modal__group-count">2</span>
+</div>
+<div class="search-modal__list">
+<a class="search-modal__item" href="/store/call-of-duty/ancient-call-of-duty">
+<div class="search-modal__item-image">
+<img alt="Ancient - Call of Duty" class="object-cover rounded" src="/assets/images/bearcheats/j9ery4.webp"/>
+</div>
+<div class="search-modal__item-info">
+<span class="search-modal__item-name">Ancient - Call of Duty</span>
+<div class="search-modal__item-details">
+<span class="search-modal__item-price">$6.00 - $48.00</span>
+<span class="search-modal__item-stock">In stock</span>
+</div>
+</div>
+<svg class="search-modal__item-arrow" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg>
+</a><a class="search-modal__item" href="/store/call-of-duty/bo7-wz-unlock-all">
+<div class="search-modal__item-image">
+<img alt="BO7 / WZ UNLOCK ALL" class="object-cover rounded" src="/assets/images/bearcheats/1100368.webp"/>
+</div>
+<div class="search-modal__item-info">
+<span class="search-modal__item-name">BO7 / WZ UNLOCK ALL</span>
+<div class="search-modal__item-details">
+<span class="search-modal__item-price">$10.00 - $50.00</span>
+<span class="search-modal__item-stock">In stock</span>
+</div>
+</div>
+<svg class="search-modal__item-arrow" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg>
+</a></div>
+</div>
+<div class="search-modal__group">
+<div class="search-modal__group-header">
+<span class="search-modal__group-name">COUNTER STRIKE 2</span>
+<span class="search-modal__group-count">1</span>
+</div>
+<div class="search-modal__list">
+<a class="search-modal__item" href="/store/counter-strike-2/ancient-counter-strike-2">
+<div class="search-modal__item-image">
+<img alt="Ancient - Counter Strike 2" class="object-cover rounded" src="/assets/images/bearcheats/71zhj6.webp"/>
+</div>
+<div class="search-modal__item-info">
+<span class="search-modal__item-name">Ancient - Counter Strike 2</span>
+<div class="search-modal__item-details">
+<span class="search-modal__item-price">$4.99 - $35.00</span>
+<span class="search-modal__item-stock">In stock</span>
+</div>
+</div>
+<svg class="search-modal__item-arrow" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg>
+</a></div>
+</div>
+<div class="search-modal__group">
+<div class="search-modal__group-header">
+<span class="search-modal__group-name">RUST</span>
+<span class="search-modal__group-count">1</span>
+</div>
+<div class="search-modal__list">
+<a class="search-modal__item" href="/store/rust/ancient-rust">
+<div class="search-modal__item-image">
+<img alt="Ancient - Rust" class="object-cover rounded" src="/assets/images/bearcheats/lsm2vx.webp"/>
+</div>
+<div class="search-modal__item-info">
+<span class="search-modal__item-name">Ancient - Rust</span>
+<div class="search-modal__item-details">
+<span class="search-modal__item-price">$6.00 - $50.00</span>
+<span class="search-modal__item-stock">In stock</span>
+</div>
+</div>
+<svg class="search-modal__item-arrow" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg>
+</a></div>
+</div>
+<div class="search-modal__group">
+<div class="search-modal__group-header">
+<span class="search-modal__group-name">FORTNITE</span>
+<span class="search-modal__group-count">1</span>
+</div>
+<div class="search-modal__list">
+<a class="search-modal__item" href="/store/fortnite/ancient-fortnite">
+<div class="search-modal__item-image">
+<img alt="Ancient - Fortnite" class="object-cover rounded" src="/assets/images/bearcheats/nrfi2x.webp"/>
+</div>
+<div class="search-modal__item-info">
+<span class="search-modal__item-name">Ancient - Fortnite</span>
+<div class="search-modal__item-details">
+<span class="search-modal__item-price">$6.00 - $45.00</span>
+<span class="search-modal__item-stock">In stock</span>
+</div>
+</div>
+<svg class="search-modal__item-arrow" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg>
+</a></div>
+</div>
+<div class="search-modal__group">
+<div class="search-modal__group-header">
+<span class="search-modal__group-name">MARVEL RIVALS</span>
+<span class="search-modal__group-count">1</span>
+</div>
+<div class="search-modal__list">
+<a class="search-modal__item" href="/store/marvel-rivals/ancient-marvel-rivals">
+<div class="search-modal__item-image">
+<img alt="Ancient - Marvel Rivals" class="object-cover rounded" src="/assets/images/bearcheats/1zj4pd.webp"/>
+</div>
+<div class="search-modal__item-info">
+<span class="search-modal__item-name">Ancient - Marvel Rivals</span>
+<div class="search-modal__item-details">
+<span class="search-modal__item-price">$5.99 - $40.00</span>
+<span class="search-modal__item-stock">In stock</span>
+</div>
+</div>
+<svg class="search-modal__item-arrow" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg>
+</a></div>
+</div>
+<div class="search-modal__group">
+<div class="search-modal__group-header">
+<span class="search-modal__group-name">VALORANT</span>
+<span class="search-modal__group-count">1</span>
+</div>
+<div class="search-modal__list">
+<a class="search-modal__item" href="/store/valorant/ancient-valorant">
+<div class="search-modal__item-image">
+<img alt="Ancient - Valorant" class="object-cover rounded" src="/assets/images/bearcheats/bbc8j6.webp"/>
+</div>
+<div class="search-modal__item-info">
+<span class="search-modal__item-name">Ancient - Valorant</span>
+<div class="search-modal__item-details">
+<span class="search-modal__item-price">$7.00 - $60.00</span>
+<span class="search-modal__item-stock">In stock</span>
+</div>
+</div>
+<svg class="search-modal__item-arrow" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg>
+</a></div>
+</div>
+<div class="search-modal__group">
+<div class="search-modal__group-header">
+<span class="search-modal__group-name">HWID SPOOFER</span>
+<span class="search-modal__group-count">1</span>
+</div>
+<div class="search-modal__list">
+<a class="search-modal__item" href="/store/spoofer-cleaner/hwid-spoofer-cleaner">
+<div class="search-modal__item-image">
+<img alt="HWID Spoofer & Cleaner" class="object-cover rounded" src="/assets/images/bearcheats/jw3cd5.webp"/>
+</div>
+<div class="search-modal__item-info">
+<span class="search-modal__item-name">HWID Spoofer & Cleaner</span>
+<div class="search-modal__item-details">
+<span class="search-modal__item-price">$5.00 - $60.00</span>
+<span class="search-modal__item-stock">In stock</span>
+</div>
+</div>
+<svg class="search-modal__item-arrow" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="m9 18 6-6-6-6"></path></svg>
+</a></div>
+</div>
+</div>
+<div class="search-modal__empty">
+<i class="fa-solid fa-magnifying-glass"></i>
+<p>No products found</p>
+</div>
+</div>
+</div>
+</div>

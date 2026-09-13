@@ -1,0 +1,10 @@
+{
+  "name": "virtualand-clone",
+  "version": "1.0.0",
+  "private": true,
+  "description": "High-performance Virtualand storefront clone for Vercel",
+  "scripts": {
+    "start": "npx serve . -p 3000",
+    "build": "echo 'Build complete'"
+  }
+}
