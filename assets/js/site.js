@@ -473,4 +473,186 @@
       });
     }
   });
+
+  (function initReviewsCarousel() {
+    function setup() {
+      var carousel = document.querySelector('.reviews-carousel');
+      var nav = document.querySelector('.reviews-nav');
+      if (!carousel || !nav) return;
+      var buttons = nav.querySelectorAll('button');
+      if (buttons.length < 2) return;
+      var prevBtn = buttons[0];
+      var nextBtn = buttons[1];
+
+      function getStep() {
+        var slide = carousel.querySelector('.reviews-slide');
+        if (slide) {
+          var container = carousel.querySelector('.reviews-container');
+          var gap = 24;
+          if (container && window.getComputedStyle) {
+            var g = parseFloat(window.getComputedStyle(container).gap);
+            if (!isNaN(g)) gap = g;
+          }
+          return slide.offsetWidth + gap;
+        }
+        return carousel.clientWidth * 0.8;
+      }
+
+      function updateNavState() {
+        var maxScroll = carousel.scrollWidth - carousel.clientWidth;
+        var scrollLeft = carousel.scrollLeft;
+
+        if (scrollLeft <= 8) {
+          prevBtn.classList.add('reviews-nav-btn--disabled');
+          prevBtn.disabled = true;
+          prevBtn.style.opacity = '0.35';
+          prevBtn.style.cursor = 'not-allowed';
+        } else {
+          prevBtn.classList.remove('reviews-nav-btn--disabled');
+          prevBtn.disabled = false;
+          prevBtn.style.opacity = '1';
+          prevBtn.style.cursor = 'pointer';
+        }
+
+        if (scrollLeft >= maxScroll - 8) {
+          nextBtn.classList.add('reviews-nav-btn--disabled');
+          nextBtn.disabled = true;
+          nextBtn.style.opacity = '0.35';
+          nextBtn.style.cursor = 'not-allowed';
+        } else {
+          nextBtn.classList.remove('reviews-nav-btn--disabled');
+          nextBtn.disabled = false;
+          nextBtn.style.opacity = '1';
+          nextBtn.style.cursor = 'pointer';
+        }
+      }
+
+      nextBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        carousel.scrollBy({ left: getStep(), behavior: 'smooth' });
+        setTimeout(updateNavState, 350);
+      });
+
+      prevBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        carousel.scrollBy({ left: -getStep(), behavior: 'smooth' });
+        setTimeout(updateNavState, 350);
+      });
+
+      carousel.addEventListener('scroll', updateNavState, { passive: true });
+      window.addEventListener('resize', updateNavState);
+      updateNavState();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setup);
+    } else {
+      setup();
+    }
+  })();
+
+
+  (function initOnlineCounter() {
+    var count = 184;
+    function updateOnlineDisplays() {
+      var elements = document.querySelectorAll('.online-count, nav .tabular-nums, .stats-box--online .stats-box__metric');
+      elements.forEach(function(el) {
+        el.textContent = count;
+      });
+    }
+    updateOnlineDisplays();
+    setInterval(function() {
+      var delta = Math.floor(Math.random() * 3) - 1;
+      count = Math.max(174, Math.min(196, count + delta));
+      updateOnlineDisplays();
+    }, 6000);
+  })();
+
+  (function initReviewsPagePagination() {
+    function setup() {
+      var grid = document.querySelector('.reviews-grid__grid');
+      var pagination = document.querySelector('.pagination');
+      if (!grid || !pagination) return;
+
+      var cards = grid.querySelectorAll('.reviews-card');
+      if (cards.length === 0) return;
+
+      cards.forEach(function(card, idx) {
+        if (idx < 12) {
+          card.setAttribute('data-page', '1');
+          card.style.display = '';
+        } else {
+          card.setAttribute('data-page', '2');
+          card.style.display = 'none';
+        }
+      });
+
+      var prevLi = pagination.querySelector('.pagination__nav--prev');
+      var nextLi = pagination.querySelector('.pagination__nav--next');
+      var p1Li = pagination.querySelector('.pagination__page--1');
+      var p2Li = pagination.querySelector('.pagination__page--2');
+      if (!p1Li || !p2Li) return;
+
+      var currentPage = 1;
+
+      function goToPage(page) {
+        if (page === currentPage) return;
+        currentPage = page;
+
+        cards.forEach(function(card) {
+          if (card.getAttribute('data-page') === String(page)) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        if (currentPage === 1) {
+          p1Li.classList.add('pagination__page--active');
+          p2Li.classList.remove('pagination__page--active');
+          if (prevLi) prevLi.classList.add('pagination__nav--disabled');
+          if (nextLi) nextLi.classList.remove('pagination__nav--disabled');
+        } else {
+          p2Li.classList.add('pagination__page--active');
+          p1Li.classList.remove('pagination__page--active');
+          if (prevLi) prevLi.classList.remove('pagination__nav--disabled');
+          if (nextLi) nextLi.classList.add('pagination__nav--disabled');
+        }
+
+        var reviewsSection = document.getElementById('reviews-grid') || grid;
+        reviewsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      p1Li.addEventListener('click', function(e) {
+        e.preventDefault();
+        goToPage(1);
+      });
+
+      p2Li.addEventListener('click', function(e) {
+        e.preventDefault();
+        goToPage(2);
+      });
+
+      if (prevLi) {
+        prevLi.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (currentPage > 1) goToPage(currentPage - 1);
+        });
+      }
+
+      if (nextLi) {
+        nextLi.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (currentPage < 2) goToPage(currentPage + 1);
+        });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setup);
+    } else {
+      setup();
+    }
+  })();
+
 })();
