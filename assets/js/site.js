@@ -44,7 +44,7 @@
     videoPlayer.style.cursor = 'pointer';
     videoPlayer.addEventListener('click', function(e) {
       e.preventDefault();
-      var videoId = videoPlayer.getAttribute('data-video-id') || 'WJxJLBkU0AI';
+      var videoId = videoPlayer.getAttribute('data-video-id') || 'OdOsNi4v-jg';
       var modal = document.createElement('div');
       modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md';
       modal.innerHTML = '<div class="relative w-full max-w-4xl aspect-video rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black">' +
