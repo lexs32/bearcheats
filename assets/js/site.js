@@ -1368,10 +1368,12 @@
           var targetUrl = data.url || data.invoice_url;
           if (targetUrl) {
             if (targetUrl.indexOf('bearcheats.net/checkout/') !== -1) {
-              targetUrl = targetUrl.replace(/https?:\/\/bearcheats\.net\/checkout\//, 'https://bearcheats.sellauth.com/checkout/');
-              targetUrl = targetUrl.replace('bearcheats.net/checkout/', 'bearcheats.sellauth.com/checkout/');
+              targetUrl = targetUrl.replace(/https?:\/\/bearcheats\.net\/checkout\//, 'https://bearcheats.mysellauth.com/checkout/');
+              targetUrl = targetUrl.replace('bearcheats.net/checkout/', 'bearcheats.mysellauth.com/checkout/');
+            } else if (targetUrl.indexOf('bearcheats.sellauth.com/checkout/') !== -1) {
+              targetUrl = targetUrl.replace('bearcheats.sellauth.com/checkout/', 'bearcheats.mysellauth.com/checkout/');
             } else if (targetUrl.indexOf('/checkout/') === 0) {
-              targetUrl = 'https://bearcheats.sellauth.com' + targetUrl;
+              targetUrl = 'https://bearcheats.mysellauth.com' + targetUrl;
             }
             try {
               localStorage.removeItem('bearcheats_cart');

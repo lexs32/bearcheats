@@ -47,12 +47,12 @@
   "redirects": [
     {
       "source": "/checkout/(.*)",
-      "destination": "https://bearcheats.sellauth.com/checkout/$1",
+      "destination": "https://bearcheats.mysellauth.com/checkout/$1",
       "permanent": false
     },
     {
       "source": "/checkout",
-      "destination": "https://bearcheats.sellauth.com",
+      "destination": "https://bearcheats.mysellauth.com",
       "permanent": false
     },
     {
