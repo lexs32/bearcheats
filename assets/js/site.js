@@ -41,31 +41,36 @@
 
   var videoPlayer = document.querySelector('.video-player');
   if (videoPlayer) {
-    videoPlayer.style.cursor = 'pointer';
     videoPlayer.addEventListener('click', function(e) {
       e.preventDefault();
+      if (videoPlayer.classList.contains('is-playing')) return;
       var videoId = videoPlayer.getAttribute('data-video-id') || 'OdOsNi4v-jg';
-      var modal = document.createElement('div');
-      modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md';
-      modal.innerHTML = '<div class="relative w-full max-w-4xl aspect-video rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black">' +
-        '<button class="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/60 text-white hover:bg-black/90 flex items-center justify-center transition-all close-video">&times;</button>' +
-        '<iframe class="w-full h-full" src="https://www.youtube.com/embed/' + videoId + '?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>' +
-        '</div>';
-      document.body.appendChild(modal);
-      document.body.style.overflow = 'hidden';
-      
-      var closeModal = function() {
-        modal.remove();
-        document.body.style.overflow = '';
-      };
-      
-      modal.querySelector('.close-video').addEventListener('click', closeModal);
-      modal.addEventListener('click', function(evt) {
-        if (evt.target === modal) closeModal();
-      });
-      document.addEventListener('keydown', function(evt) {
-        if (evt.key === 'Escape') closeModal();
-      }, { once: true });
+      videoPlayer.classList.add('is-playing');
+      var thumb = videoPlayer.querySelector('.video-thumbnail');
+      var playBtn = videoPlayer.querySelector('.video-play-btn');
+      if (thumb) {
+        thumb.style.opacity = '0';
+        thumb.style.pointerEvents = 'none';
+      }
+      if (playBtn) {
+        playBtn.style.opacity = '0';
+        playBtn.style.pointerEvents = 'none';
+      }
+      var existingIframe = videoPlayer.querySelector('iframe');
+      if (!existingIframe) {
+        var iframe = document.createElement('iframe');
+        iframe.setAttribute('src', 'https://www.youtube-nocookie.com/embed/' + videoId + '?autoplay=1&rel=0');
+        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+        iframe.setAttribute('allowfullscreen', 'true');
+        iframe.setAttribute('title', 'Video showcase');
+        iframe.style.position = 'absolute';
+        iframe.style.inset = '0';
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.border = '0';
+        iframe.style.borderRadius = 'inherit';
+        videoPlayer.appendChild(iframe);
+      }
     });
   }
 
@@ -1621,6 +1626,158 @@
       document.addEventListener('DOMContentLoaded', setup);
     } else {
       setup();
+    }
+  })();
+
+  (function initSellAuthStatusSync() {
+    var ALIASES = {
+      'arcraiders': 'Ancient - ARC Raiders',
+      'ancientarcraiderscheat': 'Ancient - ARC Raiders',
+      'ancientarcraiders': 'Ancient - ARC Raiders',
+      'krusharcraiders': 'Krush - Arc Raiders',
+      'infernor6full': 'Inferno - R6 Full',
+      'crusaderr6full': 'Inferno - R6 Full',
+      'ancientr6external': 'Ancient - R6 External',
+      'r6lite': 'R6 Lite',
+      'vegar6': 'Vega - R6',
+      'r6svegaexternalcheat': 'Vega - R6',
+      'sapphireunlockallr6s': 'Sapphire Unlock All - R6S',
+      'exodusr6s': 'Exodus - R6S',
+      'ancientapexlegends': 'Krush - Apex Legends',
+      'apexproexternal': 'Krush - Apex Legends',
+      'krushapexlegends': 'Krush - Apex Legends',
+      'phantommodernwarfarewarzone': 'Private - Call Of Duty',
+      'callofdutydmacheat': 'Private - Call Of Duty',
+      'bo7wzunlockall': 'Private - Call Of Duty',
+      'privatecallofduty': 'Private - Call Of Duty',
+      'primecs2cheat': 'Predator - Cs2',
+      'cs2espaimbotprivate': 'Predator - Cs2',
+      'predatorcs2': 'Predator - Cs2',
+      'oxiderustcheat': 'Nebula - Rust Internal',
+      'nebularustinternal': 'Nebula - Rust Internal',
+      'rustexternalesp': 'Nebula - Rust External',
+      'nebularustexternal': 'Nebula - Rust External',
+      'vanguardfortnitecheat': 'Exodus - Fortnite External',
+      'exodusfortniteexternal': 'Exodus - Fortnite External',
+      'fortnitesoftaimesp': 'Nebula - Fortnite External',
+      'disconnectfortniteexternal': 'Nebula - Fortnite External',
+      'nebulafortniteexternal': 'Nebula - Fortnite External',
+      'novamarvelrivals': 'Predator - Marvel Rivals',
+      'predatormarvelrivals': 'Predator - Marvel Rivals',
+      'bearspooferpermanent': 'Verse - Perm Spoofer',
+      'versepermspoofer': 'Verse - Perm Spoofer',
+      'bearspoofertempcleaner': 'Verse - Perm Spoofer',
+      'hwidspoofercleaner': 'Verse - Perm Spoofer'
+    };
+
+    function normalize(s) {
+      return (s || '').replace(/&amp;/g, '&').toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function matchProduct(name, href, products) {
+      var normName = normalize(name);
+      var lastSlug = href ? href.split('/').filter(Boolean).pop() : '';
+      var normSlug = normalize(lastSlug);
+
+      for (var i = 0; i < products.length; i++) {
+        var p = products[i];
+        if (normName && normName === normalize(p.name)) return p;
+      }
+
+      for (var j = 0; j < products.length; j++) {
+        var p2 = products[j];
+        var pPath = normalize(p2.path);
+        if (pPath && (normSlug === pPath || normSlug.includes(pPath) || (href && normalize(href).includes(pPath)))) return p2;
+      }
+
+      var aliasTarget = ALIASES[normSlug] || ALIASES[normName];
+      if (aliasTarget) {
+        for (var k = 0; k < products.length; k++) {
+          if (products[k].name === aliasTarget) return products[k];
+        }
+      }
+
+      for (var l = 0; l < products.length; l++) {
+        var p3 = products[l];
+        var pNorm = normalize(p3.name);
+        if (normName && (normName.includes(pNorm) || pNorm.includes(normName))) return p3;
+      }
+
+      return null;
+    }
+
+    function applyStatus(badge, product) {
+      if (!badge || !product) return;
+      var textEl = badge.querySelector('.status-badge__text') || badge;
+      var statusText = (product.status || 'Undetected').toUpperCase();
+      textEl.textContent = statusText;
+
+      var color = product.color || '#2ecc71';
+      badge.style.color = color;
+      badge.style.borderLeftColor = color;
+      badge.style.backgroundColor = color + '20';
+
+      var bgIcon = badge.querySelector('.status-badge__bg-icon');
+      if (bgIcon) {
+        bgIcon.style.color = color;
+      }
+    }
+
+    function updateAllStatuses(products) {
+      if (!Array.isArray(products) || !products.length) return;
+
+      var statusItems = document.querySelectorAll('.status-item');
+      statusItems.forEach(function(item) {
+        var nameEl = item.querySelector('.status-item__name');
+        var linkEl = item.querySelector('a');
+        var badge = item.querySelector('.status-badge');
+        var name = nameEl ? nameEl.textContent : '';
+        var href = linkEl ? linkEl.getAttribute('href') : '';
+        var matched = matchProduct(name, href, products);
+        if (matched && badge) {
+          applyStatus(badge, matched);
+        }
+      });
+
+      var cards = document.querySelectorAll('.product-card, [class*="product-card"], .store-card');
+      cards.forEach(function(card) {
+        var titleEl = card.querySelector('h3, h4, .product-card__title, [class*="title"]');
+        var linkEl = card.querySelector('a[href*="/store/"]') || card.querySelector('a');
+        var badge = card.querySelector('.status-badge');
+        var name = titleEl ? titleEl.textContent : '';
+        var href = linkEl ? linkEl.getAttribute('href') : '';
+        var matched = matchProduct(name, href, products);
+        if (matched && badge) {
+          applyStatus(badge, matched);
+        }
+      });
+
+      var standaloneBadge = document.querySelector('.product-hero .status-badge, .product-header .status-badge, main .status-badge');
+      if (standaloneBadge && !standaloneBadge.closest('.status-item') && !standaloneBadge.closest('.product-card')) {
+        var pageTitleEl = document.querySelector('h1');
+        var pageName = pageTitleEl ? pageTitleEl.textContent : document.title;
+        var matched = matchProduct(pageName, window.location.pathname, products);
+        if (matched) {
+          applyStatus(standaloneBadge, matched);
+        }
+      }
+    }
+
+    function sync() {
+      fetch('/api/status')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data && data.success && Array.isArray(data.products)) {
+            updateAllStatuses(data.products);
+          }
+        })
+        .catch(function() {});
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', sync);
+    } else {
+      sync();
     }
   })();
 
