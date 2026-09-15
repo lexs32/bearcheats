@@ -655,4 +655,90 @@
     }
   })();
 
+  (function initGroupFilters() {
+    function setup() {
+      var filterContainer = document.querySelector('.group-filter__controls');
+      if (!filterContainer) return;
+
+      var filterBtns = filterContainer.querySelectorAll('.group-filter__btn');
+      var statusGroups = document.querySelectorAll('.status-group');
+      var reviewCards = document.querySelectorAll('.reviews-card');
+
+      function filterByText(targetText) {
+        var normTarget = (targetText || 'ALL').trim().toUpperCase();
+
+        filterBtns.forEach(function(b) {
+          var bText = b.textContent.trim().toUpperCase();
+          if (normTarget === 'ALL' ? bText === 'ALL' : bText === normTarget) {
+            b.classList.add('group-filter__btn--active');
+          } else {
+            b.classList.remove('group-filter__btn--active');
+          }
+        });
+
+        if (statusGroups.length) {
+          statusGroups.forEach(function(grp) {
+            var nameEl = grp.querySelector('.status-group__name, h3, h4');
+            var groupName = (nameEl ? nameEl.textContent : '').trim().toUpperCase();
+            if (normTarget === 'ALL' || groupName === normTarget || groupName.includes(normTarget) || normTarget.includes(groupName)) {
+              grp.style.display = '';
+            } else {
+              grp.style.display = 'none';
+            }
+          });
+        }
+
+        if (reviewCards.length) {
+          reviewCards.forEach(function(card) {
+            var pLink = card.querySelector('.reviews-product-link');
+            var href = pLink ? (pLink.getAttribute('href') || '').toLowerCase() : '';
+            var pName = card.querySelector('.reviews-product-name');
+            var nameText = pName ? pName.textContent.trim().toUpperCase() : '';
+            if (normTarget === 'ALL') {
+              card.style.display = '';
+            } else {
+              var targetSlug = normTarget.toLowerCase().replace(/[^a-z0-9]/g, '-');
+              if (href.includes(targetSlug) || nameText.includes(normTarget)) {
+                card.style.display = '';
+              } else {
+                card.style.display = 'none';
+              }
+            }
+          });
+        }
+      }
+
+      filterBtns.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          var text = btn.textContent.trim();
+          filterByText(text);
+          var href = btn.getAttribute('href');
+          if (href && window.history && window.history.pushState) {
+            window.history.pushState(null, '', href);
+          }
+        });
+      });
+
+      var urlParams = new URLSearchParams(window.location.search);
+      var groupParam = urlParams.get('group') || urlParams.get('game');
+      if (groupParam) {
+        var foundBtn = null;
+        filterBtns.forEach(function(b) {
+          var href = b.getAttribute('href') || '';
+          if (href.includes(groupParam)) foundBtn = b;
+        });
+        if (foundBtn) {
+          filterByText(foundBtn.textContent.trim());
+        }
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setup);
+    } else {
+      setup();
+    }
+  })();
+
 })();

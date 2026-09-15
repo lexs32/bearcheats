@@ -48,6 +48,9 @@
   mask-origin: content-box, border-box !important;
   display: block !important;
 }
+.category-card:hover:after {
+  animation-duration: 3s, 1.5s !important;
+}
 .category-card__link {
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 12px !important;
@@ -59,8 +62,8 @@
 }
 .category-card:hover .category-card__link,
 .category-card__link:hover {
-  border-color: #df923e !important;
-  box-shadow: 0 0 20px rgba(223, 146, 62, 0.4) !important;
+  border-color: rgba(223, 146, 62, 0.35) !important;
+  box-shadow: 0 0 10px rgba(223, 146, 62, 0.15) !important;
 }
 .category-card__image {
   position: relative !important;
