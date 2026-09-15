@@ -306,30 +306,8 @@
     }
   });
 
-  var variantBtns = document.querySelectorAll('.variant-btn');
   var currentUnitPrice = 0;
   var quantityVal = 1;
-
-  if (variantBtns.length) {
-    var initialSelected = document.querySelector('.variant-btn-selected') || variantBtns[0];
-    if (initialSelected) {
-      var priceMatch = initialSelected.textContent.match(/[0-9]+(?:.[0-9]+)?/);
-      if (priceMatch) currentUnitPrice = parseFloat(priceMatch[0]);
-    }
-
-    variantBtns.forEach(function(btn) {
-      btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        variantBtns.forEach(function(b) { b.classList.remove('variant-btn-selected'); });
-        btn.classList.add('variant-btn-selected');
-        var match = btn.textContent.match(/[0-9]+(?:.[0-9]+)?/);
-        if (match) {
-          currentUnitPrice = parseFloat(match[0]);
-          updateTotals();
-        }
-      });
-    });
-  }
 
   function updateTotals() {
     var total = (currentUnitPrice * quantityVal).toFixed(2);
@@ -339,6 +317,48 @@
     if (priceEl) priceEl.textContent = symbol + total;
     if (totalValEl) totalValEl.textContent = symbol + total;
   }
+
+  function getButtonPrice(btn) {
+    if (!btn) return 0;
+    var priceEl = btn.querySelector('.flex.items-end .font-semibold, .variant-btn-price');
+    if (priceEl) {
+      var m = priceEl.textContent.match(/[0-9]+(?:\.[0-9]+)?/);
+      if (m) return parseFloat(m[0]);
+    }
+    var matches = btn.textContent.match(/[$€£]\s*([0-9]+(?:\.[0-9]+)?)/);
+    if (matches) return parseFloat(matches[1]);
+    var all = btn.textContent.match(/[0-9]+(?:\.[0-9]+)?/g);
+    if (all && all.length) return parseFloat(all[all.length - 1]);
+    return 0;
+  }
+
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.variant-btn');
+    if (btn) {
+      e.preventDefault();
+      var all = document.querySelectorAll('.variant-btn');
+      all.forEach(function(b) { b.classList.remove('variant-btn-selected'); });
+      btn.classList.add('variant-btn-selected');
+      var p = getButtonPrice(btn);
+      if (p > 0) {
+        currentUnitPrice = p;
+        updateTotals();
+      }
+    }
+  });
+
+  function initVariantSelection() {
+    var initial = document.querySelector('.variant-btn-selected') || document.querySelector('.variant-btn');
+    if (initial) {
+      initial.classList.add('variant-btn-selected');
+      var p = getButtonPrice(initial);
+      if (p > 0) {
+        currentUnitPrice = p;
+        updateTotals();
+      }
+    }
+  }
+  initVariantSelection();
 
   var qtySelectors = document.querySelectorAll('.quantity-selector');
   qtySelectors.forEach(function(sel) {
@@ -400,211 +420,508 @@
   }
 
   var CATALOG = [
-    {
-      id: 804989,
-      name: "Inferno - R6 Full",
-      path: "crusader-r6-full",
-      slugs: ["inferno-r6-full", "crusader-r6-full", "akuma-r6-full-cheat"],
-      variants: [
-        { id: 1377265, name: "1 Day Key", price: 6.00 },
-        { id: 1377266, name: "7 Day Key", price: 30.00 },
-        { id: 1377267, name: "30 Day Key", price: 60.00 }
-      ]
-    },
-    {
-      id: 804991,
-      name: "Exodus - Fortnite External",
-      path: "exodus-fortnite-external",
-      slugs: ["exodus-fortnite-external", "torix-fortnite-external-cheat", "ancient-fortnite", "ancient-fortnite-cheat", "ds6-ia-edition-fortnite", "fortnite-dma-cheat"],
-      variants: [
-        { id: 1377275, name: "1 Day Key", price: 5.99 },
-        { id: 1377274, name: "3 Day Key", price: 8.00 },
-        { id: 1377273, name: "7 Day Key", price: 20.00 },
-        { id: 1377276, name: "30 Day Key", price: 40.00 }
-      ]
-    },
-    {
-      id: 804994,
-      name: "Vega - R6",
-      path: "vega-r6",
-      slugs: ["vega-r6", "r6s-vega-external-cheat"],
-      variants: [
-        { id: 1377290, name: "1 Day Key", price: 6.00 },
-        { id: 1377288, name: "3 Day Key", price: 12.00 },
-        { id: 1377289, name: "7 Day Key", price: 25.00 },
-        { id: 1377287, name: "30 Day Key", price: 50.00 }
-      ]
-    },
-    {
-      id: 804995,
-      name: "R6 Lite",
-      path: "r6-lite",
-      slugs: ["r6-lite"],
-      variants: [
-        { id: 1377292, name: "1 Day Key", price: 4.99 },
-        { id: 1377294, name: "3 Day Key", price: 8.00 },
-        { id: 1377291, name: "7 Day Key", price: 15.00 },
-        { id: 1377293, name: "30 Day Key", price: 30.00 }
-      ]
-    },
-    {
-      id: 804996,
-      name: "Ancient - ARC Raiders",
-      path: "ancient-arc-raiders",
-      slugs: ["ancient-arc-raiders", "ancient-arc-raiders-cheat", "game-arc-raiders"],
-      variants: [
-        { id: 1377297, name: "1 Day Key", price: 5.99 },
-        { id: 1377296, name: "7 Day Key", price: 20.00 },
-        { id: 1377295, name: "30 Day Key", price: 40.00 }
-      ]
-    },
-    {
-      id: 804997,
-      name: "Ancient - R6 External",
-      path: "ancient-r6-external",
-      slugs: ["ancient-r6-external", "r6s-ancient-external-cheat"],
-      variants: [
-        { id: 1377298, name: "1 Day Key", price: 6.00 },
-        { id: 1377300, name: "7 Day Key", price: 15.00 },
-        { id: 1377299, name: "30 Day Key", price: 30.00 }
-      ]
-    },
-    {
-      id: 805018,
-      name: "Krush - Apex Legends",
-      path: "krush-apex-legends",
-      slugs: ["krush-apex-legends", "ancient-apex-legends", "arcane-apex-legends-cheat", "division-apex-legends-cheat"],
-      variants: [
-        { id: 1377372, name: "1 Day Key", price: 6.00 },
-        { id: 1377373, name: "7 Day Key", price: 20.00 },
-        { id: 1377374, name: "30 Day Key", price: 40.00 }
-      ]
-    },
-    {
-      id: 805019,
-      name: "Nebula - Fortnite External",
-      path: "disconnect-fortnite-external",
-      slugs: ["disconnect-fortnite-external", "nebula-fortnite-external"],
-      variants: [
-        { id: 1377375, name: "1 Day Key", price: 10.00 },
-        { id: 1377376, name: "3 Day Key", price: 20.00 },
-        { id: 1377377, name: "7 Day Key", price: 35.00 },
-        { id: 1377378, name: "30 Day Key", price: 65.00 },
-        { id: 1377379, name: "Lifetime Key", price: 300.00 }
-      ]
-    },
-    {
-      id: 805020,
-      name: "Nebula - Rust Internal",
-      path: "nebula-rust-internal",
-      slugs: ["nebula-rust-internal", "ancient-rust-internal-cheat"],
-      variants: [
-        { id: 1377380, name: "3 Day Key", price: 22.00 },
-        { id: 1401079, name: "7 Day Key", price: 45.00 },
-        { id: 1401080, name: "30 Day Key", price: 85.00 }
-      ]
-    },
-    {
-      id: 817475,
-      name: "Nebula - Rust External",
-      path: "nebula-rust-external",
-      slugs: ["nebula-rust-external", "division-rust-external-cheat", "mek-rust-external-cheat", "ancient-rust"],
-      variants: [
-        { id: 1401065, name: "1 Day Key", price: 9.99 },
-        { id: 1401066, name: "3 Day Key", price: 19.99 },
-        { id: 1401067, name: "7 Day Key", price: 34.99 },
-        { id: 1401068, name: "30 Day Key", price: 60.00 },
-        { id: 1401069, name: "Lifetime Key", price: 300.00 }
-      ]
-    },
-    {
-      id: 823467,
-      name: "Private - Call Of Duty",
-      path: "private-call-of-duty",
-      slugs: ["private-call-of-duty", "ancient-call-of-duty", "external-private-q-bo7-wz", "progress-external-cheat-mw2-bo7", "ldv4-external-cheat-mw3-bo7", "call-of-duty"],
-      variants: [
-        { id: 1412646, name: "1 Day Key", price: 5.99 },
-        { id: 1412647, name: "3 Day Key", price: 10.00 },
-        { id: 1412648, name: "7 Day Key", price: 20.00 },
-        { id: 1412649, name: "30 Day Key", price: 50.00 },
-        { id: 1412650, name: "90 Day Key", price: 99.99 }
-      ]
-    },
-    {
-      id: 856078,
-      name: "Predator - Cs2",
-      path: "predator-cs2",
-      slugs: ["predator-cs2", "ancient-counter-strike-2", "arcane-cs2-cheat"],
-      variants: [
-        { id: 1532720, name: "1 Day Key", price: 3.00 },
-        { id: 1532721, name: "7 Day Key", price: 6.00 },
-        { id: 1532722, name: "30 Day Key", price: 8.00 },
-        { id: 1532723, name: "1 Year Key", price: 54.00 }
-      ]
-    },
-    {
-      id: 856080,
-      name: "Verse - Perm Spoofer",
-      path: "verse-perm-spoofer",
-      slugs: ["verse-perm-spoofer", "perm-spoofer", "hwid-spoofer-cleaner", "temp-hwid-tpm-spoofer", "spoofer-cleaner"],
-      variants: [
-        { id: 1532841, name: "One Time Use", price: 24.00 },
-        { id: 1532842, name: "Lifetime", price: 80.00 }
-      ]
-    },
-    {
-      id: 856084,
-      name: "Predator - Marvel Rivals",
-      path: "predator-marvel-rivals",
-      slugs: ["predator-marvel-rivals", "ancient-marvel-rivals", "arcane-marvel-rivals-cheat"],
-      variants: [
-        { id: 1532957, name: "1 Day Key", price: 6.00 },
-        { id: 1532958, name: "7 Day Key", price: 15.00 },
-        { id: 1532959, name: "30 Day Key", price: 30.00 },
-        { id: 1532960, name: "1 Year Key", price: 100.00 }
-      ]
-    },
-    {
-      id: 856085,
-      name: "Krush - Arc Raiders",
-      path: "krush-arc-raiders",
-      slugs: ["krush-arc-raiders", "arc-raiders"],
-      variants: [
-        { id: 1532961, name: "1 Day Key", price: 6.00 },
-        { id: 1532962, name: "7 Day Key", price: 30.00 },
-        { id: 1532963, name: "30 Day Key", price: 60.00 }
-      ]
-    },
-    {
-      id: 856087,
-      name: "Sapphire Unlock All - R6S",
-      path: "sapphire-unlock-all-r6s",
-      slugs: ["sapphire-unlock-all-r6s"],
-      variants: [
-        { id: 1532965, name: "3 Day Key", price: 10.00 },
-        { id: 1532966, name: "7 Day Key", price: 20.00 },
-        { id: 1532967, name: "30 Day Key", price: 40.00 }
-      ]
-    },
-    {
-      id: 856088,
-      name: "Exodus - R6S",
-      path: "exodus-r6s",
-      slugs: ["exodus-r6s"],
-      variants: [
-        { id: 1532968, name: "1 Day Key", price: 6.00 },
-        { id: 1532969, name: "3 Day Key", price: 12.00 },
-        { id: 1532970, name: "7 Day Key", price: 24.00 },
-        { id: 1532971, name: "30 Day Key", price: 48.00 }
-      ]
-    }
-  ];
+  {
+    "id": 804989,
+    "name": "Inferno - R6 Full",
+    "path": "crusader-r6-full",
+    "slugs": [
+      "inferno-r6-full",
+      "crusader-r6-full",
+      "akuma-r6-full-cheat"
+    ],
+    "variants": [
+      {
+        "id": 1377265,
+        "name": "1 Day Key",
+        "price": 6
+      },
+      {
+        "id": 1377266,
+        "name": "7 Day Key",
+        "price": 30
+      },
+      {
+        "id": 1377267,
+        "name": "30 Day Key",
+        "price": 60
+      }
+    ]
+  },
+  {
+    "id": 804991,
+    "name": "Exodus - Fortnite External",
+    "path": "exodus-fortnite-external",
+    "slugs": [
+      "exodus-fortnite-external",
+      "torix-fortnite-external-cheat",
+      "ancient-fortnite",
+      "ancient-fortnite-cheat",
+      "ds6-ia-edition-fortnite",
+      "fortnite-dma-cheat"
+    ],
+    "variants": [
+      {
+        "id": 1377275,
+        "name": "1 Day Key",
+        "price": 5.99
+      },
+      {
+        "id": 1377274,
+        "name": "3 Day Key",
+        "price": 8
+      },
+      {
+        "id": 1377273,
+        "name": "7 Day Key",
+        "price": 20
+      },
+      {
+        "id": 1377276,
+        "name": "30 Day Key",
+        "price": 40
+      }
+    ]
+  },
+  {
+    "id": 804994,
+    "name": "Vega - R6",
+    "path": "vega-r6",
+    "slugs": [
+      "vega-r6"
+    ],
+    "variants": [
+      {
+        "id": 1377290,
+        "name": "1 Day Key",
+        "price": 6
+      },
+      {
+        "id": 1377288,
+        "name": "3 Day Key",
+        "price": 12
+      },
+      {
+        "id": 1377289,
+        "name": "7 Day Key",
+        "price": 25
+      },
+      {
+        "id": 1377287,
+        "name": "30 Day Key",
+        "price": 50
+      }
+    ]
+  },
+  {
+    "id": 804995,
+    "name": "R6 Lite",
+    "path": "r6-lite",
+    "slugs": [
+      "r6-lite"
+    ],
+    "variants": [
+      {
+        "id": 1377292,
+        "name": "1 Day Key",
+        "price": 4.99
+      },
+      {
+        "id": 1377294,
+        "name": "3 Day Key",
+        "price": 8
+      },
+      {
+        "id": 1377291,
+        "name": "7 Day Key",
+        "price": 15
+      },
+      {
+        "id": 1377293,
+        "name": "30 Day Key",
+        "price": 30
+      }
+    ]
+  },
+  {
+    "id": 804996,
+    "name": "Arc Raiders",
+    "path": "ancient-arc-raiders",
+    "slugs": [
+      "ancient-arc-raiders",
+      "arc-raiders",
+      "game-arc-raiders",
+      "ancient-arc-raiders-cheat",
+      "arcane-arc-raiders-cheat"
+    ],
+    "variants": [
+      {
+        "id": 1377297,
+        "name": "1 Day Key",
+        "price": 5.99
+      },
+      {
+        "id": 1377296,
+        "name": "7 Day Key",
+        "price": 20
+      },
+      {
+        "id": 1377295,
+        "name": "30 Day Key",
+        "price": 40
+      }
+    ]
+  },
+  {
+    "id": 804997,
+    "name": "Ancient - R6 External",
+    "path": "ancient-r6-external",
+    "slugs": [
+      "ancient-r6-external",
+      "r6s-ancient-external-cheat"
+    ],
+    "variants": [
+      {
+        "id": 1377298,
+        "name": "1 Day Key",
+        "price": 6
+      },
+      {
+        "id": 1377300,
+        "name": "7 Day Key",
+        "price": 15
+      },
+      {
+        "id": 1377299,
+        "name": "30 Day Key",
+        "price": 30
+      }
+    ]
+  },
+  {
+    "id": 805018,
+    "name": "Krush - Apex Legends",
+    "path": "krush-apex-legends",
+    "slugs": [
+      "krush-apex-legends"
+    ],
+    "variants": [
+      {
+        "id": 1377372,
+        "name": "1 Day Key",
+        "price": 6
+      },
+      {
+        "id": 1377373,
+        "name": "7 Day Key",
+        "price": 20
+      },
+      {
+        "id": 1377374,
+        "name": "30 Day Key",
+        "price": 40
+      }
+    ]
+  },
+  {
+    "id": 805019,
+    "name": "Nebula - Fortnite External",
+    "path": "disconnect-fortnite-external",
+    "slugs": [
+      "disconnect-fortnite-external",
+      "nebula-fortnite-external"
+    ],
+    "variants": [
+      {
+        "id": 1377375,
+        "name": "1 Day Key",
+        "price": 10
+      },
+      {
+        "id": 1377376,
+        "name": "3 Day Key",
+        "price": 20
+      },
+      {
+        "id": 1377377,
+        "name": "7 Day Key",
+        "price": 35
+      },
+      {
+        "id": 1377378,
+        "name": "30 Day Key",
+        "price": 65
+      },
+      {
+        "id": 1377379,
+        "name": "Lifetime Key",
+        "price": 300
+      }
+    ]
+  },
+  {
+    "id": 805020,
+    "name": "Nebula - Rust Internal",
+    "path": "nebula-rust-internal",
+    "slugs": [
+      "nebula-rust-internal"
+    ],
+    "variants": [
+      {
+        "id": 1377380,
+        "name": "3 Day Key",
+        "price": 22
+      },
+      {
+        "id": 1401079,
+        "name": "7 Day Key",
+        "price": 45
+      },
+      {
+        "id": 1401080,
+        "name": "30 Day Key",
+        "price": 85
+      }
+    ]
+  },
+  {
+    "id": 817475,
+    "name": "Nebula - Rust External",
+    "path": "nebula-rust-external",
+    "slugs": [
+      "nebula-rust-external"
+    ],
+    "variants": [
+      {
+        "id": 1401065,
+        "name": "1 Day Key",
+        "price": 9.99
+      },
+      {
+        "id": 1401066,
+        "name": "3 Day Key",
+        "price": 19.99
+      },
+      {
+        "id": 1401067,
+        "name": "7 Day Key",
+        "price": 34.99
+      },
+      {
+        "id": 1401068,
+        "name": "30 Day Key",
+        "price": 60
+      },
+      {
+        "id": 1401069,
+        "name": "Lifetime Key",
+        "price": 300
+      }
+    ]
+  },
+  {
+    "id": 823467,
+    "name": "Private - Call Of Duty",
+    "path": "private-call-of-duty",
+    "slugs": [
+      "private-call-of-duty"
+    ],
+    "variants": [
+      {
+        "id": 1412646,
+        "name": "1 Day Key",
+        "price": 5.99
+      },
+      {
+        "id": 1412647,
+        "name": "3 Day Key",
+        "price": 10
+      },
+      {
+        "id": 1412648,
+        "name": "7 Day Key",
+        "price": 20
+      },
+      {
+        "id": 1412649,
+        "name": "30 Day Key",
+        "price": 50
+      },
+      {
+        "id": 1412650,
+        "name": "90 Day Key",
+        "price": 99.99
+      }
+    ]
+  },
+  {
+    "id": 856078,
+    "name": "Predator - Cs2",
+    "path": "predator-cs2",
+    "slugs": [
+      "predator-cs2"
+    ],
+    "variants": [
+      {
+        "id": 1532720,
+        "name": "1 Day Key",
+        "price": 3
+      },
+      {
+        "id": 1532721,
+        "name": "7 Day Key",
+        "price": 6
+      },
+      {
+        "id": 1532722,
+        "name": "30 Day Key",
+        "price": 8
+      },
+      {
+        "id": 1532723,
+        "name": "1 Year Key",
+        "price": 54
+      }
+    ]
+  },
+  {
+    "id": 856080,
+    "name": "Verse - Perm Spoofer",
+    "path": "verse-perm-spoofer",
+    "slugs": [
+      "verse-perm-spoofer"
+    ],
+    "variants": [
+      {
+        "id": 1532841,
+        "name": "One Time Use",
+        "price": 24
+      },
+      {
+        "id": 1532842,
+        "name": "Lifetime",
+        "price": 80
+      }
+    ]
+  },
+  {
+    "id": 856084,
+    "name": "Predator - Marvel Rivals",
+    "path": "predator-marvel-rivals",
+    "slugs": [
+      "predator-marvel-rivals",
+      "ancient-marvel-rivals",
+      "arcane-marvel-rivals-cheat"
+    ],
+    "variants": [
+      {
+        "id": 1532957,
+        "name": "1 Day Key",
+        "price": 6
+      },
+      {
+        "id": 1532958,
+        "name": "7 Day Key",
+        "price": 15
+      },
+      {
+        "id": 1532959,
+        "name": "30 Day Key",
+        "price": 30
+      },
+      {
+        "id": 1532960,
+        "name": "1 Year Key",
+        "price": 100
+      }
+    ]
+  },
+  {
+    "id": 856085,
+    "name": "Krush - Arc Raiders",
+    "path": "krush-arc-raiders",
+    "slugs": [
+      "krush-arc-raiders"
+    ],
+    "variants": [
+      {
+        "id": 1532961,
+        "name": "1 Day Key",
+        "price": 6
+      },
+      {
+        "id": 1532962,
+        "name": "7 Day Key",
+        "price": 30
+      },
+      {
+        "id": 1532963,
+        "name": "30 Day Key",
+        "price": 60
+      }
+    ]
+  },
+  {
+    "id": 856087,
+    "name": "Sapphire Unlock All - R6S",
+    "path": "sapphire-unlock-all-r6s",
+    "slugs": [
+      "sapphire-unlock-all-r6s"
+    ],
+    "variants": [
+      {
+        "id": 1532965,
+        "name": "3 Day Key",
+        "price": 10
+      },
+      {
+        "id": 1532966,
+        "name": "7 Day Key",
+        "price": 20
+      },
+      {
+        "id": 1532967,
+        "name": "30 Day Key",
+        "price": 40
+      }
+    ]
+  },
+  {
+    "id": 856088,
+    "name": "Exodus - R6S",
+    "path": "exodus-r6s",
+    "slugs": [
+      "exodus-r6s"
+    ],
+    "variants": [
+      {
+        "id": 1532968,
+        "name": "1 Day Key",
+        "price": 6
+      },
+      {
+        "id": 1532969,
+        "name": "3 Day Key",
+        "price": 12
+      },
+      {
+        "id": 1532970,
+        "name": "7 Day Key",
+        "price": 24
+      },
+      {
+        "id": 1532971,
+        "name": "30 Day Key",
+        "price": 48
+      }
+    ]
+  }
+];
 
   function resolveCurrentProduct() {
     var path = (window.location.pathname || '').toLowerCase();
     var titleEl = document.querySelector('.product-page__title h1') || document.querySelector('.product-page__title') || document.querySelector('h1');
-    var title = titleEl ? titleEl.textContent.trim().toLowerCase() : '';
-    var cleanTitle = title.replace(/[^a-z0-9]/g, '');
+    var rawTitle = titleEl ? titleEl.textContent.trim() : '';
+    var cleanTitle = rawTitle.toLowerCase().replace(/[^a-z0-9]/g, '');
 
     for (var i = 0; i < CATALOG.length; i++) {
       var p = CATALOG[i];
@@ -636,33 +953,31 @@
     var selectedBtn = document.querySelector('.variant-btn-selected') || document.querySelector('.variant-btn');
     if (!selectedBtn) return product.variants[0];
 
-    var btnText = selectedBtn.textContent.toLowerCase();
-    var priceMatch = btnText.match(/[0-9]+(?:.[0-9]+)?/);
-    var foundPrice = priceMatch ? parseFloat(priceMatch[0]) : null;
+    var btnText = (selectedBtn.innerText || selectedBtn.textContent || '').trim();
+    var foundPrice = getButtonPrice(selectedBtn);
 
-    var patterns = [
-      /1s*day/,
-      /3s*day/,
-      /7s*day|week/,
-      /30s*day|month/,
-      /90s*day/,
-      /1s*year|year/,
-      /lifetime/,
-      /ones*time/
+    var checks = [
+      { regex: /\b(?:1|one)\s*year/i, matchName: /1\s*year/i },
+      { regex: /\b90\s*day/i, matchName: /90\s*day/i },
+      { regex: /\b30\s*day|\bmonth/i, matchName: /30\s*day/i },
+      { regex: /\b7\s*day|\bweek/i, matchName: /7\s*day/i },
+      { regex: /\b3\s*day/i, matchName: /3\s*day/i },
+      { regex: /\b1\s*day/i, matchName: /1\s*day/i },
+      { regex: /\blifetime/i, matchName: /lifetime/i },
+      { regex: /\bone\s*time/i, matchName: /one\s*time/i }
     ];
 
-    for (var i = 0; i < patterns.length; i++) {
-      var pat = patterns[i];
-      if (pat.test(btnText)) {
+    for (var i = 0; i < checks.length; i++) {
+      if (checks[i].regex.test(btnText)) {
         for (var v = 0; v < product.variants.length; v++) {
-          if (pat.test(product.variants[v].name.toLowerCase())) {
+          if (checks[i].matchName.test(product.variants[v].name)) {
             return product.variants[v];
           }
         }
       }
     }
 
-    if (foundPrice !== null) {
+    if (foundPrice > 0) {
       for (var j = 0; j < product.variants.length; j++) {
         if (Math.abs(parseFloat(product.variants[j].price) - foundPrice) < 0.05) {
           return product.variants[j];
@@ -675,7 +990,66 @@
 
   function getCart() {
     try {
-      return JSON.parse(localStorage.getItem('bearcheats_cart') || '[]');
+      var raw = JSON.parse(localStorage.getItem('bearcheats_cart') || '[]');
+      if (!Array.isArray(raw)) return [];
+      var clean = [];
+      for (var i = 0; i < raw.length; i++) {
+        var item = raw[i];
+        if (!item) continue;
+        var name = item.name || item.title;
+        var variantName = item.variantName || item.variant;
+        if (!name || name === 'undefined' || !variantName || variantName === 'undefined') {
+          continue;
+        }
+        name = name.replace(/^Ancient\s*-\s*/i, '');
+        var price = parseFloat(item.price);
+        if (isNaN(price) || price <= 0) continue;
+
+        var productId = Number(item.productId);
+        var variantId = Number(item.variantId);
+
+        if (!productId || isNaN(productId) || !variantId || isNaN(variantId)) {
+          var matchedProduct = null;
+          for (var p = 0; p < CATALOG.length; p++) {
+            var catName = CATALOG[p].name.toLowerCase();
+            if (name.toLowerCase().includes(catName) || catName.includes(name.toLowerCase())) {
+              matchedProduct = CATALOG[p];
+              break;
+            }
+          }
+          if (!matchedProduct) matchedProduct = CATALOG[0];
+          productId = matchedProduct.id;
+
+          var matchedVariant = null;
+          for (var v = 0; v < matchedProduct.variants.length; v++) {
+            if (Math.abs(parseFloat(matchedProduct.variants[v].price) - price) < 0.05) {
+              matchedVariant = matchedProduct.variants[v];
+              break;
+            }
+          }
+          if (!matchedVariant) matchedVariant = matchedProduct.variants[0];
+          variantId = matchedVariant.id;
+          variantName = matchedVariant.name;
+          item.path = matchedProduct.path;
+        }
+
+        clean.push({
+          id: String(productId) + '-' + String(variantId),
+          productId: productId,
+          variantId: variantId,
+          path: item.path || 'crusader-r6-full',
+          name: name,
+          variantName: variantName,
+          price: price,
+          quantity: Math.max(1, parseInt(item.quantity) || 1),
+          image: item.image || '/assets/images/bearcheats_head.png'
+        });
+      }
+
+      if (clean.length !== raw.length) {
+        localStorage.setItem('bearcheats_cart', JSON.stringify(clean));
+      }
+      return clean;
     } catch(e) {
       return [];
     }
@@ -725,7 +1099,7 @@
     var mainImage = document.querySelector('.product-gallery__main img') || document.querySelector('.product-page img');
     var imageSrc = mainImage ? (mainImage.getAttribute('src') || '') : '/assets/images/bearcheats_head.png';
     var titleEl = document.querySelector('.product-page__title h1') || document.querySelector('.product-page__title') || document.querySelector('h1');
-    var displayTitle = titleEl ? titleEl.textContent.trim() : product.name;
+    var displayTitle = (product && product.name) ? product.name : 'Arc Raiders';
 
     var qty = Math.max(1, quantityVal || 1);
     var cart = getCart();
@@ -837,13 +1211,14 @@
 
         var itemTotal = ((item.price || 0) * (item.quantity || 1)).toFixed(2);
         var imgSrc = item.image || '/assets/images/bearcheats_head.png';
+        var displayName = item.name ? item.name.replace(/^Ancient\s*-\s*/i, '') : 'Arc Raiders';
 
         row.innerHTML = '<div class="cart-item__image">' +
-          '<img src="' + imgSrc + '" alt="' + item.name + '" style="position:absolute;height:100%;width:100%;inset:0;object-fit:cover;border-radius:inherit;" />' +
+          '<img src="' + imgSrc + '" alt="' + displayName + '" style="position:absolute;height:100%;width:100%;inset:0;object-fit:cover;border-radius:inherit;" />' +
           '</div>' +
           '<div class="cart-item__info">' +
-          '<h3 class="cart-item__name">' + item.name + '</h3>' +
-          '<div class="cart-item__variant">' + item.variantName + '</div>' +
+          '<h3 class="cart-item__name">' + displayName + '</h3>' +
+          '<div class="cart-item__variant">' + (item.variantName || '1 Day Key') + '</div>' +
           '<div class="cart-item__unit-price">$' + (item.price || 0).toFixed(2) + ' each</div>' +
           '</div>' +
           '<div class="cart-item__quantity">' +
@@ -943,8 +1318,13 @@
           body: JSON.stringify(payload)
         })
         .then(function(res) {
-          if (!res.ok) throw new Error('Status: ' + res.status);
-          return res.json();
+          return res.json().then(function(data) {
+            if (!res.ok) {
+              var msg = (data && (data.error || data.message)) || ('Error ' + res.status);
+              throw new Error(msg);
+            }
+            return data;
+          });
         })
         .then(function(data) {
           var targetUrl = data.url || data.invoice_url;
@@ -956,9 +1336,17 @@
           }
         })
         .catch(function(err) {
-          var first = cart[0];
-          var fallbackPath = first && first.path ? first.path : 'crusader-r6-full';
-          window.location.href = 'https://bearcheats.sellauth.com/checkout/' + fallbackPath;
+          console.error(err);
+          checkoutBtn.disabled = false;
+          checkoutBtn.innerHTML = origHtml;
+          var errNotice = document.querySelector('.checkout-error-notice');
+          if (!errNotice) {
+            errNotice = document.createElement('div');
+            errNotice.className = 'checkout-error-notice';
+            errNotice.style.cssText = 'color:#ef4444;font-size:13px;margin-top:8px;text-align:center;font-weight:500;';
+            checkoutBtn.parentNode.insertBefore(errNotice, checkoutBtn.nextSibling);
+          }
+          errNotice.textContent = err.message || 'Unable to create checkout session. Please try again.';
         });
       });
     }
