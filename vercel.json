@@ -43,5 +43,12 @@
         }
       ]
     }
+  ],
+  "redirects": [
+    {
+      "source": "/store/valorant(.*)",
+      "destination": "/store",
+      "permanent": false
+    }
   ]
 }
