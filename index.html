@@ -13,11 +13,43 @@
 <link rel="manifest" href="/site.webmanifest"/><link rel="canonical" href="https://bearcheats.net/"/>
 
 <style id="bearcheats-category-hover-styles">
+@property --card-border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes categoryCardRotate {
+  to {
+    --card-border-angle: 360deg;
+  }
+}
+@keyframes categoryCardOpacity {
+  0% { opacity: .6; }
+  20%, 70% { opacity: 1; }
+  to { opacity: .6; }
+}
 .category-card {
   position: relative !important;
 }
 .category-card:after {
-  display: none !important;
+  content: "" !important;
+  background: conic-gradient(from calc(var(--card-border-angle) + 187deg), transparent 0, rgba(139, 69, 19, 0.25) 14%, #8b4513 18%, #c67d3e 21%, #df923e 22.5%, #8b4513 25%, transparent 29%) !important;
+  -webkit-mask-composite: xor !important;
+  mask-composite: exclude !important;
+  z-index: 10 !important;
+  pointer-events: none !important;
+  border-radius: 12px !important;
+  padding: 1.5px !important;
+  animation: 10s linear infinite categoryCardRotate, 4s linear infinite categoryCardOpacity !important;
+  position: absolute !important;
+  inset: 0 !important;
+  -webkit-mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0) !important;
+  mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0) !important;
+  -webkit-mask-clip: content-box, border-box !important;
+  mask-clip: content-box, border-box !important;
+  -webkit-mask-origin: content-box, border-box !important;
+  mask-origin: content-box, border-box !important;
+  display: block !important;
 }
 .category-card__link {
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -52,7 +84,6 @@
   height: 100% !important;
   display: block !important;
   opacity: 1 !important;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 .category-card__img--secondary {
   position: absolute !important;
@@ -61,16 +92,11 @@
   height: 100% !important;
   object-fit: cover !important;
   opacity: 0 !important;
-  transition: opacity 0.5s ease-in-out, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-.category-card:hover .category-card__img--primary,
-.category-card__link:hover .category-card__img--primary {
-  transform: scale(1.08) !important;
+  transition: opacity 0.5s ease-in-out !important;
 }
 .category-card:hover .category-card__img--secondary,
 .category-card__link:hover .category-card__img--secondary {
   opacity: 1 !important;
-  transform: scale(1.08) !important;
 }
 .category-badge {
   position: absolute !important;
