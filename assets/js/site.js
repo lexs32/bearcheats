@@ -553,8 +553,6 @@
     "path": "ancient-arc-raiders",
     "slugs": [
       "ancient-arc-raiders",
-      "arc-raiders",
-      "game-arc-raiders",
       "ancient-arc-raiders-cheat",
       "arcane-arc-raiders-cheat"
     ],
@@ -928,23 +926,34 @@
     var rawTitle = titleEl ? titleEl.textContent.trim() : '';
     var cleanTitle = rawTitle.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-    for (var i = 0; i < CATALOG.length; i++) {
-      var p = CATALOG[i];
-      for (var j = 0; j < p.slugs.length; j++) {
-        if (path.includes(p.slugs[j])) return p;
+    var pathSegments = path.split('/').filter(Boolean);
+    var lastSlug = pathSegments.length ? pathSegments[pathSegments.length - 1].replace(/\.html$/, '') : '';
+
+    if (lastSlug) {
+      for (var i = 0; i < CATALOG.length; i++) {
+        var p = CATALOG[i];
+        if (p.path.toLowerCase() === lastSlug) return p;
+        for (var j = 0; j < p.slugs.length; j++) {
+          if (p.slugs[j].toLowerCase() === lastSlug) return p;
+        }
       }
     }
 
-    for (var k = 0; k < CATALOG.length; k++) {
-      var prod = CATALOG[k];
-      var cleanPName = prod.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (cleanTitle.includes(cleanPName) || cleanPName.includes(cleanTitle)) return prod;
+    if (cleanTitle) {
+      for (var k = 0; k < CATALOG.length; k++) {
+        var prod = CATALOG[k];
+        var cleanPName = prod.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (cleanPName && (cleanTitle === cleanPName || cleanTitle.includes(cleanPName) || cleanPName.includes(cleanTitle))) {
+          return prod;
+        }
+      }
     }
 
     for (var m = 0; m < CATALOG.length; m++) {
       var pr = CATALOG[m];
-      var cleanPPath = pr.path.toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (cleanTitle.includes(cleanPPath) || path.includes(cleanPPath)) return pr;
+      for (var n = 0; n < pr.slugs.length; n++) {
+        if (path.includes(pr.slugs[n])) return pr;
+      }
     }
 
     return CATALOG[0];
@@ -1012,6 +1021,29 @@
 
         var productId = Number(item.productId);
         var variantId = Number(item.variantId);
+
+        if (productId === 804996 && (name.toLowerCase().includes('krush') || (item.path && item.path.includes('krush')))) {
+          productId = 856085;
+          name = 'Krush - Arc Raiders';
+          item.path = 'krush-arc-raiders';
+          var krushProd = null;
+          for (var kp = 0; kp < CATALOG.length; kp++) {
+            if (CATALOG[kp].id === 856085) { krushProd = CATALOG[kp]; break; }
+          }
+          if (krushProd) {
+            var matchedV = null;
+            for (var kv = 0; kv < krushProd.variants.length; kv++) {
+              if (krushProd.variants[kv].name.toLowerCase() === (variantName || '').toLowerCase()) {
+                matchedV = krushProd.variants[kv];
+                break;
+              }
+            }
+            if (!matchedV) matchedV = krushProd.variants[0];
+            variantId = matchedV.id;
+            price = matchedV.price;
+            variantName = matchedV.name;
+          }
+        }
 
         if (!productId || isNaN(productId) || !variantId || isNaN(variantId)) {
           var matchedProduct = null;
@@ -1104,7 +1136,8 @@
     var mainImage = document.querySelector('.product-gallery__main img') || document.querySelector('.product-page img');
     var imageSrc = mainImage ? (mainImage.getAttribute('src') || '') : '/assets/images/bearcheats_head.png';
     var titleEl = document.querySelector('.product-page__title h1') || document.querySelector('.product-page__title') || document.querySelector('h1');
-    var displayTitle = (product && product.name) ? product.name : 'Arc Raiders';
+    var rawTitle = titleEl ? titleEl.textContent.trim() : '';
+    var displayTitle = (rawTitle && !rawTitle.toLowerCase().includes('undefined')) ? rawTitle : ((product && product.name) ? product.name : 'Product');
 
     var qty = Math.max(1, quantityVal || 1);
     var cart = getCart();
@@ -1334,7 +1367,15 @@
         .then(function(data) {
           var targetUrl = data.url || data.invoice_url;
           if (targetUrl) {
-            localStorage.removeItem('bearcheats_cart');
+            if (targetUrl.indexOf('bearcheats.net/checkout/') !== -1) {
+              targetUrl = targetUrl.replace(/https?:\/\/bearcheats\.net\/checkout\//, 'https://bearcheats.sellauth.com/checkout/');
+              targetUrl = targetUrl.replace('bearcheats.net/checkout/', 'bearcheats.sellauth.com/checkout/');
+            } else if (targetUrl.indexOf('/checkout/') === 0) {
+              targetUrl = 'https://bearcheats.sellauth.com' + targetUrl;
+            }
+            try {
+              localStorage.removeItem('bearcheats_cart');
+            } catch (e) {}
             window.location.href = targetUrl;
           } else {
             throw new Error('No url returned');

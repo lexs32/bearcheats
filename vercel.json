@@ -46,6 +46,16 @@
   ],
   "redirects": [
     {
+      "source": "/checkout/(.*)",
+      "destination": "https://bearcheats.sellauth.com/checkout/$1",
+      "permanent": false
+    },
+    {
+      "source": "/checkout",
+      "destination": "https://bearcheats.sellauth.com",
+      "permanent": false
+    },
+    {
       "source": "/store/valorant(.*)",
       "destination": "/store",
       "permanent": false
