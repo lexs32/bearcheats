@@ -1763,15 +1763,51 @@
       }
     }
 
+    function fetchDirect() {
+      return fetch('https://api.sellauth.com/v1/shops/255381/products', {
+        headers: {
+          'Authorization': 'Bearer 6151040|OcCgJWN7HCCkz1LCkKJfKbxqSQOunx85BD1jZ55H9b5cc923',
+          'Accept': 'application/json'
+        }
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(json) {
+        var rawList = Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []);
+        return rawList.map(function(p) {
+          return {
+            id: p.id,
+            name: p.name,
+            path: p.path,
+            status: p.status_text || 'Undetected',
+            color: p.status_color || '#2ecc71',
+            stock: p.stock_count !== undefined ? p.stock_count : p.stock
+          };
+        });
+      });
+    }
+
     function sync() {
       fetch('/api/status')
-        .then(function(r) { return r.json(); })
+        .then(function(r) {
+          if (!r.ok) throw new Error('API route unavailable');
+          return r.json();
+        })
         .then(function(data) {
-          if (data && data.success && Array.isArray(data.products)) {
+          if (data && data.success && Array.isArray(data.products) && data.products.length) {
             updateAllStatuses(data.products);
+          } else {
+            throw new Error('Invalid products array');
           }
         })
-        .catch(function() {});
+        .catch(function() {
+          fetchDirect()
+            .then(function(products) {
+              if (Array.isArray(products) && products.length) {
+                updateAllStatuses(products);
+              }
+            })
+            .catch(function() {});
+        });
     }
 
     if (document.readyState === 'loading') {
