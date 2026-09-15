@@ -1362,70 +1362,126 @@
     function setup() {
       var carousel = document.querySelector('.reviews-carousel');
       var nav = document.querySelector('.reviews-nav');
-      if (!carousel || !nav) return;
-      var buttons = nav.querySelectorAll('button');
-      if (buttons.length < 2) return;
-      var prevBtn = buttons[0];
-      var nextBtn = buttons[1];
+      if (!carousel) return;
+      var container = carousel.querySelector('.reviews-container');
+      if (!container) return;
+
+      var buttons = nav ? nav.querySelectorAll('button') : [];
+      var prevBtn = buttons.length >= 2 ? buttons[0] : null;
+      var nextBtn = buttons.length >= 2 ? buttons[1] : null;
+
+      var originalSlides = Array.prototype.slice.call(container.querySelectorAll('.reviews-slide'));
+      if (originalSlides.length === 0) return;
+
+      originalSlides.forEach(function(slide) {
+        var clone = slide.cloneNode(true);
+        clone.setAttribute('aria-hidden', 'true');
+        container.appendChild(clone);
+      });
+
+      var isPaused = false;
+      var resumeTimeout = null;
+      var isDragging = false;
+      var startX = 0;
+      var startScrollLeft = 0;
+      var scrollSpeed = 0.5;
+
+      function pauseScroll(duration) {
+        isPaused = true;
+        if (resumeTimeout) clearTimeout(resumeTimeout);
+        if (duration) {
+          resumeTimeout = setTimeout(function() {
+            isPaused = false;
+          }, duration);
+        }
+      }
+
+      function resumeScroll() {
+        if (resumeTimeout) clearTimeout(resumeTimeout);
+        isPaused = false;
+      }
+
+      carousel.addEventListener('mouseenter', function() { pauseScroll(); });
+      carousel.addEventListener('mouseleave', function() { resumeScroll(); });
+
+      carousel.addEventListener('touchstart', function() {
+        pauseScroll(4000);
+      }, { passive: true });
+
+      carousel.addEventListener('touchend', function() {
+        pauseScroll(2000);
+      }, { passive: true });
+
+      carousel.addEventListener('mousedown', function(e) {
+        isDragging = true;
+        startX = e.pageX - carousel.offsetLeft;
+        startScrollLeft = carousel.scrollLeft;
+        pauseScroll();
+      });
+
+      window.addEventListener('mousemove', function(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+        var x = e.pageX - carousel.offsetLeft;
+        var walk = (x - startX);
+        carousel.scrollLeft = startScrollLeft - walk;
+      });
+
+      window.addEventListener('mouseup', function() {
+        if (isDragging) {
+          isDragging = false;
+          pauseScroll(2000);
+        }
+      });
 
       function getStep() {
         var slide = carousel.querySelector('.reviews-slide');
         if (slide) {
-          var container = carousel.querySelector('.reviews-container');
           var gap = 24;
-          if (container && window.getComputedStyle) {
+          if (window.getComputedStyle) {
             var g = parseFloat(window.getComputedStyle(container).gap);
             if (!isNaN(g)) gap = g;
           }
           return slide.offsetWidth + gap;
         }
-        return carousel.clientWidth * 0.8;
+        return 380;
       }
 
-      function updateNavState() {
-        var maxScroll = carousel.scrollWidth - carousel.clientWidth;
-        var scrollLeft = carousel.scrollLeft;
-
-        if (scrollLeft <= 8) {
-          prevBtn.classList.add('reviews-nav-btn--disabled');
-          prevBtn.disabled = true;
-          prevBtn.style.opacity = '0.35';
-          prevBtn.style.cursor = 'not-allowed';
-        } else {
-          prevBtn.classList.remove('reviews-nav-btn--disabled');
-          prevBtn.disabled = false;
-          prevBtn.style.opacity = '1';
-          prevBtn.style.cursor = 'pointer';
-        }
-
-        if (scrollLeft >= maxScroll - 8) {
-          nextBtn.classList.add('reviews-nav-btn--disabled');
-          nextBtn.disabled = true;
-          nextBtn.style.opacity = '0.35';
-          nextBtn.style.cursor = 'not-allowed';
-        } else {
-          nextBtn.classList.remove('reviews-nav-btn--disabled');
-          nextBtn.disabled = false;
-          nextBtn.style.opacity = '1';
-          nextBtn.style.cursor = 'pointer';
-        }
+      if (nextBtn) {
+        nextBtn.disabled = false;
+        nextBtn.classList.remove('reviews-nav-btn--disabled');
+        nextBtn.style.opacity = '1';
+        nextBtn.style.cursor = 'pointer';
+        nextBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          pauseScroll(3000);
+          carousel.scrollBy({ left: getStep(), behavior: 'smooth' });
+        });
       }
 
-      nextBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        carousel.scrollBy({ left: getStep(), behavior: 'smooth' });
-        setTimeout(updateNavState, 350);
-      });
+      if (prevBtn) {
+        prevBtn.disabled = false;
+        prevBtn.classList.remove('reviews-nav-btn--disabled');
+        prevBtn.style.opacity = '1';
+        prevBtn.style.cursor = 'pointer';
+        prevBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          pauseScroll(3000);
+          carousel.scrollBy({ left: -getStep(), behavior: 'smooth' });
+        });
+      }
 
-      prevBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        carousel.scrollBy({ left: -getStep(), behavior: 'smooth' });
-        setTimeout(updateNavState, 350);
-      });
-
-      carousel.addEventListener('scroll', updateNavState, { passive: true });
-      window.addEventListener('resize', updateNavState);
-      updateNavState();
+      function tick() {
+        if (!isPaused && !isDragging) {
+          var singleSetWidth = container.scrollWidth / 2;
+          carousel.scrollLeft += scrollSpeed;
+          if (carousel.scrollLeft >= singleSetWidth) {
+            carousel.scrollLeft -= singleSetWidth;
+          }
+        }
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
     }
 
     if (document.readyState === 'loading') {
